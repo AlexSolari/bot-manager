@@ -8,7 +8,7 @@
     export let data;
 
     onMount(() => {
-        currentBot.update((x) => data.botName as BotNames);
+        currentBot.update((_) => data.botName as BotNames);
     });
 </script>
 

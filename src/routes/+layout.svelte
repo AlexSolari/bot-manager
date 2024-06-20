@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { currentBot } from "$lib/stores";
-    import { BotNames, type SelectedBotName } from "$lib/types";
+    import { BotNames } from "$lib/types";
     import "../app.css";
 
     const bots = Object.values(BotNames);
@@ -11,7 +11,7 @@
     currentBot.subscribe((x) => (selectedBot = x));
 
     function changeUser() {
-        currentBot.update((x) => selectedBot as SelectedBotName);
+        currentBot.update((_) => selectedBot);
         goto("/" + selectedBot);
     }
 </script>

@@ -1,5 +1,5 @@
-import { isSignedOn } from '$lib/index.server';
-import { error } from '@sveltejs/kit';
+import { isSignedOn, forbidden } from '$lib/index.server';
+import { BotNames } from '$lib/types';
 import { exec } from 'child_process'
 import { promisify } from 'util'
 const execAsync = promisify(exec);
@@ -9,7 +9,11 @@ export async function load({ cookies, params }) {
 
     const isLoggedIn = await isSignedOn(cookies);
     if (!isLoggedIn) {
-        error(405, { message: "not allowed" });
+        forbidden("Not logged in.");
+    }
+
+    if (!(botName in BotNames)) {
+        forbidden("Invalid bot name.");
     }
 
     const logs = import.meta.env.MODE == "development"

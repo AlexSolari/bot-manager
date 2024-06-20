@@ -5,3 +5,7 @@ export enum BotNames {
 }
 
 export type SelectedBotName = BotNames | null;
+
+export interface BotRestartRequest {
+    bot: string
+};

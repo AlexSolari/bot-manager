@@ -1,6 +1,6 @@
 node_modules
 dummy-data
-/static/pass.word
+/pass.word
 # Output
 .output
 .vercel
