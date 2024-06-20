@@ -1,6 +1,7 @@
 import { get as getFromStore } from 'svelte/store';
 import { currentBot as botStore } from "$lib/stores";
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export function get(url: string, data: any = {}): Promise<Response> {
     const currentBot = getFromStore(botStore);
     const dataWithUser = { bot: currentBot, ...data };
@@ -9,6 +10,7 @@ export function get(url: string, data: any = {}): Promise<Response> {
     return fetch(urlWithQuery);
 }
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export function post(url: string, data: any = {}): Promise<Response> {
     const currentBot = getFromStore(botStore);
 
