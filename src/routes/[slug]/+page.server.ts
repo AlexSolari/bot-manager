@@ -8,15 +8,15 @@ export async function load({ cookies, params }) {
     const botName = params.slug;
 
     const isLoggedIn = await isSignedOn(cookies);
-    if (!isLoggedIn){
+    if (!isLoggedIn) {
         error(405, { message: "not allowed" });
     }
 
-	const logs = import.meta.env.MODE == "development"
-     ? await (await execAsync(`Get-Content "C:\\Users\\Cheezie\\Desktop\\bot-manager\\dummy-data\\` + botName + `.txt"`, {'shell':'powershell.exe'})).stdout
-	 : await (await execAsync(`sudo journalctl -u ` + botName + `.service -n 100`)).stdout;
+    const logs = import.meta.env.MODE == "development"
+        ? await (await execAsync(`Get-Content "C:\\Users\\Cheezie\\Desktop\\bot-manager\\dummy-data\\` + botName + `.txt"`, { 'shell': 'powershell.exe' })).stdout
+        : await (await execAsync(`sudo journalctl -u ` + botName + `.service -n 100`)).stdout;
 
-	const reversedLog = logs.split('\n').toReversed();
+    const reversedLog = logs.split('\n').toReversed();
 
     return {
         log: reversedLog,
