@@ -4,14 +4,15 @@
     import { BotNames, type SelectedBotName } from "$lib/types";
     import "../app.css";
 
+    const bots = Object.values(BotNames);
     let selectedBot = $currentBot;
-    currentBot.subscribe(x => selectedBot = x);
-    let bots = Object.values(BotNames);
     $: hideControl = selectedBot == null;
 
-    function changeUser(){
-        currentBot.update(x => selectedBot as SelectedBotName);
-        goto("/"+selectedBot);
+    currentBot.subscribe((x) => (selectedBot = x));
+
+    function changeUser() {
+        currentBot.update((x) => selectedBot as SelectedBotName);
+        goto("/" + selectedBot);
     }
 </script>
 
@@ -20,11 +21,18 @@
 >
     <h1 class="text-2xl font-semibold font-mono header">
         ./bots/
-        <select class="text-gray-500" bind:value={selectedBot} on:change={changeUser} disabled={hideControl}>
-            {#each bots as bot}
-            <option value="{bot}">{bot}</option>
-            {/each}
-        </select>
+        {#if !hideControl}
+            <select
+                class="text-gray-500"
+                bind:value={selectedBot}
+                on:change={changeUser}
+                disabled={hideControl}
+            >
+                {#each bots as bot}
+                    <option value={bot}>{bot}</option>
+                {/each}
+            </select>
+        {/if}
     </h1>
     <slot />
 </main>

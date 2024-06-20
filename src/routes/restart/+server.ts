@@ -6,16 +6,16 @@ import { isSignedOn } from '$lib/index.server';
 
 export async function POST({ cookies, request }) {
     const isLoggedIn = await isSignedOn(cookies);
-    if (!isLoggedIn){
+    if (!isLoggedIn) {
         error(405, { message: "not allowed" });
     }
-    
+
     const botName = (await request.json()).bot;
 
-    if (import.meta.env.MODE == "development"){
+    if (import.meta.env.MODE == "development") {
         console.log("restart requested for bot " + botName)
     }
-    else{
+    else {
         await (await execAsync(`sudo systemctl restart ` + botName + `.service`)).stdout;
     }
 
