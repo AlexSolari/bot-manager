@@ -20,5 +20,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-build.ps1
-pub.ps1
+/build.ps1
+/pub.ps1
+/salt.txt

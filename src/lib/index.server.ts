@@ -2,30 +2,32 @@ import { promises as fs } from 'fs';
 import { error, type Cookies } from '@sveltejs/kit';
 import { createHash } from 'crypto';
 
-function hash(data: string): string {
-    return createHash('sha256').update(data).digest("hex");
+async function hash(data: string): Promise<string> {
+    const salt = await fs.readFile("./salt.txt", "utf8");
+    return createHash('sha256').update(`${data}${salt}`).digest("hex");
 }
 
 export async function getCorrectPasswordHash(): Promise<string> {
-    const correctPass = await fs.readFile("./pass.word", "utf8");
+    const correctPassword = await fs.readFile("./pass.word", "utf8");
 
-    return hash(correctPass);
+    return hash(correctPassword);
 }
 
 export async function isSignedOn(cookies: Cookies): Promise<boolean> {
     const sessionId = cookies.get("sessionid") || "";
-    const correctPassHash = await getCorrectPasswordHash();
+    const correctPasswordHash = await getCorrectPasswordHash();
 
-    return sessionId == correctPassHash;
+    return sessionId == correctPasswordHash;
 }
 
 export async function isPasswordCorrect(password: string): Promise<boolean> {
-    const correctPassHash = await getCorrectPasswordHash();
-
-    return hash(password) == correctPassHash;
+    const correctPasswordHash = await getCorrectPasswordHash();
+    const passwordHash = await hash(password);
+    
+    return passwordHash == correctPasswordHash;
 }
 
 export function forbidden(reason: string = "") : never {
-    console.trace(`Returning HTTP 405: ${reason}`);
+    console.trace(`Returning HTTP 403: ${reason}`);
     error(403, { message: `Forbidden: ${reason}` });
 }
