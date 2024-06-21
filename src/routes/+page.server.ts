@@ -1,5 +1,12 @@
-import { getCorrectPasswordHash, isPasswordCorrect } from "$lib/index.server";
+import { getCorrectPasswordHash, isPasswordCorrect, isSignedOn } from "$lib/index.server";
 import { redirect } from "@sveltejs/kit";
+
+export async function load({ cookies }) {
+    const isLoggedIn = await isSignedOn(cookies);
+    if (isLoggedIn) {
+        redirect(303, "funny");
+    }
+}
 
 export const actions = {
     auth: async function ({ cookies, request }) {
