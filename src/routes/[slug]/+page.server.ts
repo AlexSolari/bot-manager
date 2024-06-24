@@ -20,7 +20,7 @@ export async function load({ cookies, params }) {
         ? (await execAsync(`Get-Content "C:\\Users\\Cheezie\\Desktop\\bot-manager\\dummy-data\\` + botName + `.txt"`, { 'shell': 'powershell.exe' })).stdout
         : (await execAsync(`sudo journalctl -u ` + botName + `.service -n 100`)).stdout;
 
-    const reversedLog = logs.split('\n').toReversed();
+    const reversedLog = logs.split('\n').map(x => x.split(']: ')[1]).toReversed();
 
     return {
         log: reversedLog,
