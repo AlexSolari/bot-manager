@@ -24,39 +24,43 @@ export async function load({ cookies, params }) {
         .split('\n')
         .map(x => x.split(']: ')[1] ?? x);
 
-    const tracesToRowsMap = new Map<string, number>();
     const groups = new Array<Array<string>>();
 
-    logEntries.forEach((row) => {
-        const foo = (/(?<traceId>TRACE\d+)? ?(?<message>.+)/i).exec(row);
-        
-        if (foo?.groups?.traceId){
-            const traceId = foo?.groups?.traceId;
-            console.log(traceId);
-
-            if (tracesToRowsMap.has(traceId)){
-                const rowNumber = tracesToRowsMap.get(traceId) as number;
-                groups[rowNumber].push(foo?.groups?.message);
-            }
-            else{
-                const newArray = [foo?.groups?.message];
-                groups.push(newArray);
-                tracesToRowsMap.set(traceId, groups.indexOf(newArray));
-            }
-        }
-        else{
-            const lastMessage = groups.at(-1) as string[];
+    if (botName == BotNames.funny){
+        const tracesToRowsMap = new Map<string, number>();
+        logEntries.forEach((row) => {
+            const foo = (/(?<traceId>TRACE\d+)? ?(?<message>.+)/i).exec(row);
             
-            if (foo?.groups?.message){
-                if (lastMessage){
-                    lastMessage.push(foo?.groups?.message);
+            if (foo?.groups?.traceId){
+                const traceId = foo?.groups?.traceId;
+    
+                if (tracesToRowsMap.has(traceId)){
+                    const rowNumber = tracesToRowsMap.get(traceId) as number;
+                    groups[rowNumber].push(foo?.groups?.message);
                 }
                 else{
-                    groups.push([foo?.groups?.message]);
+                    const newArray = [foo?.groups?.message];
+                    groups.push(newArray);
+                    tracesToRowsMap.set(traceId, groups.indexOf(newArray));
                 }
             }
-        }
-    });
+            else{
+                const lastMessage = groups.at(-1) as string[];
+                
+                if (foo?.groups?.message){
+                    if (lastMessage){
+                        lastMessage.push(foo?.groups?.message);
+                    }
+                    else{
+                        groups.push([foo?.groups?.message]);
+                    }
+                }
+            }
+        });
+    }
+    else {
+        logEntries.forEach(x => groups.push([x]));
+    }
         
     return {
         log: groups.toReversed(),
