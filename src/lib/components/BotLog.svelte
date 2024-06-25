@@ -2,7 +2,7 @@
     import { invalidateAll } from "$app/navigation";
     import { onMount } from "svelte";
 
-    export let log: string[];
+    export let log: string[][];
 
     function refresh() {
         setTimeout(() => refresh(), 5000);
@@ -18,9 +18,11 @@
     <div
         class="container mx-auto bg-muted rounded-md text-sm text-muted-foreground"
     >
-        {#each log as entry, i}
+        {#each log as entryGroup, i}
             <div class={i % 2 == 0 ? "bg-white" : "bg-slate-200"}>
-                {entry}<br />
+                {#each entryGroup as entry}
+                    {entry}<br />
+                {/each}
             </div>
         {/each}
     </div>
