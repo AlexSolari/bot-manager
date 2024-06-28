@@ -10,16 +10,8 @@
 
 .header select {
   appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
   margin-left: -15px;
   animation: cursor-blink 2s steps(2) infinite;
-}
-
-.embedded-link {
-  font-weight: 600;
-  text-decoration: underline;
-  color: #334155;
 }
 
 .log-entry{

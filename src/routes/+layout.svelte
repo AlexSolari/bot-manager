@@ -26,7 +26,6 @@
                 class="text-gray-500"
                 bind:value={selectedBot}
                 on:change={changeUser}
-                disabled={hideControl}
             >
                 {#each bots as bot}
                     <option value={bot}>{bot}</option>

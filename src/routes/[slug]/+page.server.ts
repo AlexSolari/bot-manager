@@ -29,7 +29,7 @@ export async function load({ cookies, params }) {
     if (botName == BotNames.funny){
         const tracesToRowsMap = new Map<string, number>();
         logEntries.forEach((row) => {
-            const foo = (/(?<traceId>TRACE\d+)? ?(?<message>.+)/i).exec(row);
+            const foo = (/(?<traceId>TRACE\S+)? ?(?<message>.+)/i).exec(row);
             
             if (foo?.groups?.traceId){
                 const traceId = foo?.groups?.traceId;
