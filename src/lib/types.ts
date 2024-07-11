@@ -9,3 +9,8 @@ export type SelectedBotName = BotNames | null;
 export interface BotRestartRequest {
     bot: string
 }
+
+export interface TraceGroup{
+    rows: string[],
+    traceId: string
+}
