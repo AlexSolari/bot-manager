@@ -30,20 +30,28 @@ export async function load({ cookies, params }) {
         const tracesToRowsMap = new Map<string, number>();
         logEntries.forEach((row, i) => {
             const matchResult = (/(?<traceId>TRACE\S+)? ?(?<message>.+)/i).exec(row);
-            const traceId = matchResult?.groups?.traceId ?? `TRACE:UNKNOWN:${i}`;
+            const traceIdFromMessage = matchResult?.groups?.traceId;
+            const traceId = traceIdFromMessage ?? `TRACE:UNKNOWN:${i}`;
 
             if (tracesToRowsMap.has(traceId)) {
                 const rowNumber = tracesToRowsMap.get(traceId) as number;
                 groups[rowNumber].rows.push(matchResult?.groups?.message ?? "");
             }
-            else if (matchResult?.groups?.message){
-                const newArray = [matchResult?.groups?.message];
-                const newGroup = {
-                    rows: newArray,
-                    traceId: traceId
-                } as TraceGroup;
+            else if (matchResult?.groups?.message) {
+                if (groups.length == 0 || traceIdFromMessage) {
+                    const newArray = [matchResult?.groups?.message];
+                    const newGroup = {
+                        rows: newArray,
+                        traceId: traceId
+                    } as TraceGroup;
 
-                groups.push(newGroup);
+                    groups.push(newGroup);
+                }
+                else {
+                    const lastGroup = groups.at(-1);
+
+                    lastGroup?.rows.push(matchResult?.groups?.message)
+                }
 
                 tracesToRowsMap.set(traceId, groups.length - 1);
             }
