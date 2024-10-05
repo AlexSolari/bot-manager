@@ -31,18 +31,26 @@ export async function load({ cookies, params }) {
         logEntries.forEach((row, i) => {
             const matchResult = (/(?<traceId>TRACE\S+)? ?(?<message>.+)/i).exec(row);
             const traceIdFromMessage = matchResult?.groups?.traceId;
+            const messageData = matchResult?.groups?.message ?? "";   
+            const messageDataStack = messageData.split('|');
+            const message = messageDataStack.pop() ?? "";
+            const chatName = messageDataStack.pop() ?? "";
+            const botName = messageDataStack.pop() ?? "";
+            
             const traceId = traceIdFromMessage ?? `TRACE:UNKNOWN:${i}`;
 
             if (tracesToRowsMap.has(traceId)) {
                 const rowNumber = tracesToRowsMap.get(traceId) as number;
-                groups[rowNumber].rows.push(matchResult?.groups?.message ?? "");
+                groups[rowNumber].rows.push(message);
             }
             else if (matchResult?.groups?.message) {
                 if (groups.length == 0 || traceIdFromMessage) {
-                    const newArray = [matchResult?.groups?.message];
+                    const newArray = [message];
                     const newGroup = {
                         rows: newArray,
-                        traceId: traceId
+                        traceId: traceId,
+                        botName: botName,
+                        chatName: chatName
                     } as TraceGroup;
 
                     groups.push(newGroup);
@@ -50,7 +58,7 @@ export async function load({ cookies, params }) {
                 else {
                     const lastGroup = groups.at(-1);
 
-                    lastGroup?.rows.push(matchResult?.groups?.message)
+                    lastGroup?.rows.push(message)
                 }
 
                 tracesToRowsMap.set(traceId, groups.length - 1);
@@ -61,12 +69,19 @@ export async function load({ cookies, params }) {
         logEntries.forEach(x => {
             const newGroup = {
                 rows: [x],
-                traceId: ""
+                traceId: "",
+                botName: "",
+                chatName: ""
             } as TraceGroup;
 
             return groups.push(newGroup);
         });
     }
+
+    const foo = groups.map(x => {
+        return x;
+    });
+    console.log(foo);
 
     return {
         log: groups.toReversed(),

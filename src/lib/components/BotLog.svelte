@@ -10,6 +10,13 @@
         invalidateAll();
     }
 
+    function getBotAndChatPrefixes(entryGroup: TraceGroup){
+        if (entryGroup.chatName && entryGroup.botName)
+            return `${entryGroup.botName.toUpperCase()} | ${entryGroup.chatName.split(' ').slice(0, 2).join(' ')} | `;
+
+        return '';
+    }
+
     onMount(() => {
         refresh();
     });
@@ -22,7 +29,7 @@
         {#each log as entryGroup, i}
             <div id={entryGroup.traceId} class={i % 2 == 0 ? "bg-white log-entry" : "bg-slate-200 log-entry"}>
                 {#each entryGroup.rows as entry}
-                    {entry}<br />
+                    {getBotAndChatPrefixes(entryGroup)}{entry}<br />
                 {/each}
             </div>
         {/each}

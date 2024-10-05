@@ -12,5 +12,7 @@ export interface BotRestartRequest {
 
 export interface TraceGroup{
     rows: string[],
-    traceId: string
+    traceId: string,
+    botName: string,
+    chatName: string,
 }
