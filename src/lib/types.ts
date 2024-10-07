@@ -1,7 +1,8 @@
 export enum BotNames {
     funny = "funny",
     sorry = "sorry",
-    curse = "curse"
+    curse = "curse",
+    minecraft = "minecraft"
 }
 
 export type SelectedBotName = BotNames | null;

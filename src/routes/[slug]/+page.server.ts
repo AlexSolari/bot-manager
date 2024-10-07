@@ -20,9 +20,10 @@ export async function load({ cookies, params }) {
         ? (await execAsync(`Get-Content "D:\\!src\\bot-manager\\dummy-data\\` + botName + `.txt"`, { 'shell': 'powershell.exe' })).stdout
         : (await execAsync(`sudo journalctl -u ` + botName + `.service -n 100`)).stdout;
 
+    
     const logEntries = logs
         .split('\n')
-        .map(x => x.split(']: ')[1] ?? x);
+        .map(x => x.split(']: ').slice(1).join());
 
     const groups = new Array<TraceGroup>();
 
@@ -74,14 +75,9 @@ export async function load({ cookies, params }) {
                 chatName: ""
             } as TraceGroup;
 
-            return groups.push(newGroup);
+            groups.push(newGroup);
         });
     }
-
-    const foo = groups.map(x => {
-        return x;
-    });
-    console.log(foo);
 
     return {
         log: groups.toReversed(),
