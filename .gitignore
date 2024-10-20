@@ -23,3 +23,4 @@ vite.config.ts.timestamp-*
 /build.ps1
 /pub.ps1
 /salt.txt
+src/lib/chatIds.ts

@@ -29,6 +29,8 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.2.0",
-		"object-hash": "^3.0.0"
+		"object-hash": "^3.0.0",
+		"svelte-collapsible": "^0.3.0",
+		"svelte-tabs": "^1.1.0"
 	}
 }

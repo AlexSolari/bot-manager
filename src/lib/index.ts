@@ -1,8 +1,9 @@
 import { get as getFromStore } from 'svelte/store';
 import { currentBot as botStore } from "$lib/stores";
+import { error } from '@sveltejs/kit';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-export function post(url: string, data: any = null): Promise<Response> {
+export function post(url: string, data: any = null) {
     const currentBot = getFromStore(botStore);
     const requestBody = data == null
         ? { bot: currentBot }
@@ -18,4 +19,9 @@ export function post(url: string, data: any = null): Promise<Response> {
             "Content-Type": "application/json",
         },
     });
+}
+
+export function forbidden(reason: string = "") : never {
+    console.trace(`Returning HTTP 403: ${reason}`);
+    error(403, { message: `Forbidden: ${reason}` });
 }

@@ -1,4 +1,4 @@
-import { getCorrectPasswordHash, isPasswordCorrect, isSignedOn } from "$lib/index.server";
+import { getCorrectPasswordHash, isPasswordCorrect, isSignedOn } from "$lib/auth.server";
 import { redirect } from "@sveltejs/kit";
 
 export async function load({ cookies }) {

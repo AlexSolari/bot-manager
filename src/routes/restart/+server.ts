@@ -1,9 +1,8 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
-const execAsync = promisify(exec);
 import { json } from "@sveltejs/kit";
-import { forbidden, isSignedOn } from '$lib/index.server';
+import { isSignedOn } from '$lib/auth.server';
 import { BotNames, type BotRestartRequest } from '$lib/types.js';
+import { restartBot } from '$lib/systemCalls.js';
+import { forbidden } from "$lib";
 
 export async function POST({ cookies, request }) {
     const isLoggedIn = await isSignedOn(cookies);
@@ -16,12 +15,7 @@ export async function POST({ cookies, request }) {
         forbidden("Invalid bot name.")
     }
 
-    if (import.meta.env.MODE == "development") {
-        console.log("restart requested for bot " + requestBody.bot)
-    }
-    else {
-        (await execAsync(`sudo systemctl restart ` + requestBody.bot + `.service`)).stdout;
-    }
+    await restartBot(requestBody.bot);
 
     return json(true);
 }

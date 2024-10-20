@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { error, type Cookies } from '@sveltejs/kit';
+import { type Cookies } from '@sveltejs/kit';
 import { createHash } from 'crypto';
 
 async function hash(data: string): Promise<string> {
@@ -25,9 +25,4 @@ export async function isPasswordCorrect(password: string): Promise<boolean> {
     const passwordHash = await hash(password);
     
     return passwordHash == correctPasswordHash;
-}
-
-export function forbidden(reason: string = "") : never {
-    console.trace(`Returning HTTP 403: ${reason}`);
-    error(403, { message: `Forbidden: ${reason}` });
 }

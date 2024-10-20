@@ -1,14 +1,15 @@
 <script lang="ts">
     import { invalidateAll } from "$app/navigation";
-    import type { TraceGroup } from "$lib/types";
-    import { onMount } from "svelte";
+    import { BotNames, type TraceGroup } from "$lib/types";
+    import { onDestroy, onMount } from "svelte";
 
     export let log: TraceGroup[];
+    export let botName: string;
 
-    function refresh() {
-        setTimeout(() => refresh(), 5000);
-        invalidateAll();
-    }
+    $: classes = botName == BotNames.funny
+        ? "flex-1 half-width"
+        : "flex-1";
+    
 
     function getBotAndChatPrefixes(entryGroup: TraceGroup){
         if (entryGroup.chatName && entryGroup.botName)
@@ -17,12 +18,18 @@
         return '';
     }
 
+    let interval: NodeJS.Timeout;
+
+    onDestroy(() => {
+        if (interval) clearInterval(interval);
+    });
+    
     onMount(() => {
-        refresh();
+        interval = setInterval(() => invalidateAll(), 5000);
     });
 </script>
 
-<main class="flex-1 overflow-auto">
+<main class="{classes}">
     <div
         class="container mx-auto bg-muted rounded-md text-sm text-muted-foreground"
     >
@@ -35,3 +42,10 @@
         {/each}
     </div>
 </main>
+<style>
+    @media (min-width: 1280px) { 
+        .half-width{
+            max-width: 50%;
+        }
+    }
+</style>
