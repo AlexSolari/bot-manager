@@ -34,8 +34,9 @@ export async function load({ cookies, params }) {
             const traceIdFromMessage = matchResult?.groups?.traceId;
             const messageData = matchResult?.groups?.message ?? "";   
             const messageDataStack = messageData.split('|');
+            console.log(messageDataStack);
             const message = messageDataStack.pop() ?? "";
-            const chatName = messageDataStack.pop() ?? "";
+            const chatName = messageDataStack.length == 2 ? messageDataStack.pop() ?? "" : "SYSTEM";
             const botName = messageDataStack.pop() ?? "";
             
             const traceId = traceIdFromMessage ?? `TRACE:UNKNOWN:${i}`;
