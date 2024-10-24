@@ -1,14 +1,12 @@
-import { get as getFromStore } from 'svelte/store';
-import { currentBot as botStore } from "$lib/stores";
+import { currentBot } from "$lib/stores.svelte";
 import { error } from '@sveltejs/kit';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export function post(url: string, data: any = null) {
-    const currentBot = getFromStore(botStore);
     const requestBody = data == null
-        ? { bot: currentBot }
+        ? { bot: currentBot.name }
         : {
-            bot: currentBot,
+            bot: currentBot.name,
             data: data,
           };
 

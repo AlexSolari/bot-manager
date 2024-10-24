@@ -1,18 +1,20 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { currentBot } from "$lib/stores";
+    import { currentBot } from "$lib/stores.svelte";
     import { BotNames } from "$lib/types";
     import "../app.css";
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     const bots = Object.values(BotNames);
-    let selectedBot = $currentBot;
-    $: hideControl = selectedBot == null;
+    let hideControl = $derived(currentBot.name == null);
 
-    currentBot.subscribe((x) => (selectedBot = x));
-
-    function changeUser() {
-        currentBot.update((_) => selectedBot);
-        goto("/" + selectedBot);
+    function changeUser(event: Event) {
+        currentBot.name = (event.target as any).value as BotNames;
+        goto("/" + currentBot.name);
     }
 </script>
 
@@ -24,8 +26,7 @@
         {#if !hideControl}
             <select
                 class="text-gray-500"
-                bind:value={selectedBot}
-                on:change={changeUser}
+                onchange={changeUser}
             >
                 {#each bots as bot}
                     <option value={bot}>{bot}</option>
@@ -33,7 +34,7 @@
             </select>
         {/if}
     </h1>
-    <slot />
+    {@render children?.()}
 </main>
 
 <style lang="postcss">

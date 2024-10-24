@@ -34,3 +34,10 @@ export interface FunnyBotActionMetadata{
     allowedUsers: number[],
     cooldownInSeconds: number
 }
+
+export interface BotPageProps{
+    log: TraceGroup[],
+    storedChatData: Record<string, Record<string, unknown>>,
+    actionsMetadata: Map<string, FunnyBotActionMetadata>,
+    botName: string
+}

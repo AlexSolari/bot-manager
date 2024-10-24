@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatId } from '$lib/chatIds.js';
 import { isSignedOn } from '$lib/auth.server';
-import { ActionType, BotNames, type FunnyBotActionMetadata, type TraceGroup } from '$lib/types';
+import { ActionType, BotNames, type BotPageProps, type FunnyBotActionMetadata, type TraceGroup } from '$lib/types';
 import { readFile } from 'fs/promises';
 import { getLogs, getMetadataFiles, getStorageFiles } from '../../lib/systemCalls';
 import { forbidden } from '$lib';
@@ -10,23 +9,22 @@ const actionsMetadata: Map<string, FunnyBotActionMetadata> = new Map();
 
 export async function load({ cookies, params }) {
     const botName = params.slug;
-
+    
     const isLoggedIn = await isSignedOn(cookies);
     if (!isLoggedIn) {
         forbidden("Not logged in.");
     }
-
+    
     if (!(botName in BotNames)) {
         forbidden("Invalid bot name.");
     }
-
     const logs = await getLogs(botName);
     const logEntries = logs
         .split('\n')
         .map(x => x.split(']: ').slice(1).join());
 
     const groups = new Array<TraceGroup>();
-    const filesData: Record<string, Record<string, Record<string, any>>> = {};
+    const filesData: Record<string, Record<string, Record<string, unknown>>> = {};
 
     if (botName == BotNames.funny) {
         const tracesToRowsMap = new Map<string, number>();
@@ -106,7 +104,7 @@ export async function load({ cookies, params }) {
         storedChatData: actionsDataToChatData(filesData),
         actionsMetadata: actionsMetadata,
         botName
-    };
+    } as BotPageProps;
 }
 
 async function loadMetadata() {
@@ -115,6 +113,7 @@ async function loadMetadata() {
     const metadataFilesPromises = metadataFiles.map((path) => readFile(path, { encoding: 'utf8' }));
 
     for (const promise of metadataFilesPromises) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (JSON.parse(await promise) as any[])
             .map(x => ({
                 name: x.name,
@@ -124,15 +123,15 @@ async function loadMetadata() {
                 timeInHours: x.timeinHours,
                 allowedUsers: x.allowedUsers ?? [],
                 cooldownInSeconds: x.cooldownInSeconds,
-                triggers: (x.triggers ?? []).filter((s: any) => typeof s == 'string'),
+                triggers: (x.triggers ?? []).filter((s: string | unknown) => typeof s == 'string'),
                 type: x.timeinHours != undefined ? ActionType.Scheduled : ActionType.Command
             } as FunnyBotActionMetadata))
             .forEach(x => actionsMetadata.set(x.key.split(':').at(-1)!, x));
     }
 }
 
-function actionsDataToChatData(actionsData: Record<string, Record<string, any>>): Record<string, Record<string, any>> {
-    const chatData = {} as Record<string, Record<string, any>>;
+function actionsDataToChatData(actionsData: Record<string, Record<string, unknown>>): Record<string, Record<string, unknown>> {
+    const chatData = {} as Record<string, Record<string, unknown>>;
 
     for (const name in actionsData) {
         const idObject = actionsData[name];
