@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import { currentBot } from "$lib/stores.svelte";
-    import { BotNames } from "$lib/types";
-    import "../app.css";
+    import { goto } from '$app/navigation';
+    import { currentBot } from '$lib/stores.svelte';
+    import { BotNames } from '$lib/types';
+    import type { Snippet } from 'svelte';
+    import '../app.css';
     interface Props {
-        children?: import('svelte').Snippet;
+        children: Snippet;
     }
 
     let { children }: Props = $props();
@@ -14,7 +15,7 @@
 
     function changeUser(event: Event) {
         currentBot.name = (event.target as any).value as BotNames;
-        goto("/" + currentBot.name);
+        goto('/' + currentBot.name);
     }
 </script>
 
@@ -24,17 +25,16 @@
     <h1 class="text-2xl font-semibold font-mono header">
         ./bots/
         {#if !hideControl}
-            <select
-                class="text-gray-500"
-                onchange={changeUser}
-            >
+            <select class="text-gray-500" onchange={changeUser}>
                 {#each bots as bot}
                     <option value={bot}>{bot}</option>
                 {/each}
             </select>
         {/if}
     </h1>
-    {@render children?.()}
+    <div>
+        {@render children()}
+    </div>
 </main>
 
 <style lang="postcss">

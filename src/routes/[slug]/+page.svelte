@@ -23,7 +23,12 @@
     });
 
     function getStateWithMetadata(name: string, state: any) {
-        const metadata = data.actionsMetadata.get(name)!;
+        const metadata = data.actionsMetadata.get(name);
+
+        if (!metadata) {
+            return null;
+        }
+
         const canTrigger =
             metadata.type == ActionType.Command
                 ? (currentTime.getTime() -
@@ -59,7 +64,9 @@
                         <div
                             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                         >
-                            {#each Object.entries(data.storedChatData[chatName]).map( ([name, state]) => getStateWithMetadata(name, state) ) as { metadata, state, canTrigger }}
+                            {#each Object.entries(data.storedChatData[chatName])
+                                .map( ([name, state]) => getStateWithMetadata(name, state) )
+                                .filter((x) => x != null) as { metadata, state, canTrigger }}
                                 <ActionCard
                                     {metadata}
                                     botState={state}
