@@ -5,6 +5,7 @@ import {
     BotNames,
     type BotPageProps,
     type FunnyBotActionMetadata,
+    type LogEntry,
     type TraceGroup
 } from '$lib/types';
 import { readFile } from 'fs/promises';
@@ -31,7 +32,9 @@ export async function load({ cookies, params }) {
     const logs = await getLogs(botName);
     const logEntries = logs
         .split('\n')
-        .map((x) => x.split(']: ').slice(1).join());
+        .filter((x) => x.includes('node'))
+        .map((x) => x.split(']: ').slice(1).join())
+        .filter((x) => x);
 
     const groups = new Array<TraceGroup>();
     const filesData: Record<
@@ -41,29 +44,19 @@ export async function load({ cookies, params }) {
 
     if (botName == BotNames.funny) {
         const tracesToRowsMap = new Map<string, number>();
-        logEntries.forEach((row, i) => {
-            const matchResult = /(?<traceId>TRACE\S+)? ?(?<message>.+)/i.exec(
-                row
-            );
+        logEntries
+            .map((x) => JSON.parse(x) as LogEntry)
+            .forEach((row, i) => {
+                const message =
+                    'text' in row ? row.text : JSON.stringify(row.errorObj);
+                const chatName = row.chatName;
+                const botName = row.botName;
+                const traceId = row.traceId.toString() ?? `TRACE:UNKNOWN:${i}`;
 
-            const traceIdFromMessage = matchResult?.groups?.traceId;
-            const messageData = matchResult?.groups?.message ?? '';
-
-            const messageDataStack = messageData.split('|');
-            const message = messageDataStack.pop() ?? '';
-            const chatName =
-                messageDataStack.length == 2
-                    ? messageDataStack.pop() ?? ''
-                    : 'SYSTEM';
-            const botName = messageDataStack.pop() ?? '';
-
-            const traceId = traceIdFromMessage ?? `TRACE:UNKNOWN:${i}`;
-
-            if (tracesToRowsMap.has(traceId)) {
-                const rowNumber = tracesToRowsMap.get(traceId)!;
-                groups[rowNumber].rows.push(message);
-            } else if (matchResult?.groups?.message) {
-                if (groups.length == 0 || traceIdFromMessage) {
+                if (tracesToRowsMap.has(traceId)) {
+                    const rowNumber = tracesToRowsMap.get(traceId)!;
+                    groups[rowNumber].rows.push(message);
+                } else {
                     const newArray = [message];
                     const newGroup = {
                         rows: newArray,
@@ -73,15 +66,10 @@ export async function load({ cookies, params }) {
                     } as TraceGroup;
 
                     groups.push(newGroup);
-                } else {
-                    const lastGroup = groups.at(-1);
 
-                    lastGroup?.rows.push(message);
+                    tracesToRowsMap.set(traceId, groups.length - 1);
                 }
-
-                tracesToRowsMap.set(traceId, groups.length - 1);
-            }
-        });
+            });
 
         if (actionsMetadata.size == 0) {
             await loadMetadata();

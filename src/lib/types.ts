@@ -11,6 +11,14 @@ export interface BotRestartRequest {
     bot: string;
 }
 
+export interface ActionResetRequest {
+    bot: string;
+    data: {
+        chatName: string;
+        name: string;
+    };
+}
+
 export interface TraceGroup {
     rows: string[];
     traceId: string;
@@ -41,3 +49,20 @@ export interface BotPageProps {
     actionsMetadata: Map<string, FunnyBotActionMetadata>;
     botName: string;
 }
+
+interface BotLog {
+    botName: string;
+    traceId: string | number;
+    errorObj: string | Error;
+    extraData?: unknown;
+    chatName: string;
+}
+
+interface BotError {
+    botName: string;
+    traceId: string | number;
+    text: string;
+    chatName: string;
+}
+
+export type LogEntry = BotLog | BotError;

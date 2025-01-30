@@ -14,15 +14,22 @@
     );
 
     function getBotAndChatPrefixes(entryGroup: TraceGroup) {
-        if (entryGroup.chatName && entryGroup.botName)
-            return `${entryGroup.botName.toUpperCase()} | ${entryGroup.chatName.split(' ').slice(0, 2).join(' ')} | `;
+        if (entryGroup.chatName && entryGroup.botName) {
+            const botName =
+                entryGroup.botName == 'kekruga'
+                    ? '🦛'
+                    : entryGroup.botName == 'botseiju'
+                      ? '🤖'
+                      : entryGroup.botName;
+
+            return `${botName} | ${entryGroup.chatName.split(' ').slice(0, 2).join(' ')}`;
+        }
 
         return '';
     }
 
     $effect(() => {
         const interval = setInterval(() => invalidateAll(), 5000);
-        console.log(`updating info for ${currentBot.name}`);
 
         return () => {
             clearInterval(interval);
@@ -42,7 +49,7 @@
                     : 'bg-slate-200 log-entry'}
             >
                 {#each entryGroup.rows as entry}
-                    {getBotAndChatPrefixes(entryGroup)}{entry}<br />
+                    <i>{getBotAndChatPrefixes(entryGroup)}</i> | {entry}<br />
                 {/each}
             </div>
         {/each}

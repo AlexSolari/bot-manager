@@ -1,14 +1,16 @@
 <script lang="ts">
     import { type FunnyBotActionMetadata } from '$lib/types.js';
     import StatsCollapsibleCard from './StatsCollapsibleCard.svelte';
+    import { post } from '$lib';
 
     interface Props {
         metadata: FunnyBotActionMetadata;
         botState: any;
         canTrigger: boolean;
+        chatName: string;
     }
 
-    let { metadata, botState, canTrigger }: Props = $props();
+    let { metadata, botState, canTrigger, chatName }: Props = $props();
 
     let lastExecutedDate = new Date(botState['lastExecutedDate']);
     let currentTime = $state(new Date());
@@ -49,6 +51,16 @@
             return `${hours} hours`;
         }
     }
+
+    async function reset() {
+        const response = await post('/reset', {
+            name: metadata.name,
+            chatName
+        });
+        const data = await response.json();
+
+        console.log(data);
+    }
 </script>
 
 <div
@@ -78,6 +90,13 @@
             {#if botState['scoreBoard']}
                 <StatsCollapsibleCard stats={botState['scoreBoard']} />
             {/if}
+
+            <button
+                onclick={reset}
+                class="whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground h-10 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+            >
+                Get state
+            </button>
         </div>
     </div>
     <footer class="p-4">

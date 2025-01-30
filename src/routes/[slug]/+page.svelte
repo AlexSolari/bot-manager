@@ -71,6 +71,7 @@
                                     {metadata}
                                     botState={state}
                                     {canTrigger}
+                                    {chatName}
                                 />
                             {/each}
                         </div>
