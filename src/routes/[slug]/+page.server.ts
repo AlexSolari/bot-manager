@@ -32,7 +32,7 @@ export async function load({ cookies, params }) {
     const logs = await getLogs(botName);
     const logEntries = logs
         .split('\n')
-        .filter((x) => x.includes('node'))
+        .filter((x) => x.includes('node[') || x.includes('bun['))
         .map((x) => x.split(']: ').slice(1).join())
         .filter((x) => x);
 
