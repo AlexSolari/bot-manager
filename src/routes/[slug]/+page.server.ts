@@ -18,6 +18,10 @@ import { forbidden } from '$lib';
 
 const actionsMetadata: Map<string, FunnyBotActionMetadata> = new Map();
 
+function isJsonLike(row: string) {
+    return row.at(0) == '{' && row.at(-1) == '}';
+}
+
 export async function load({ cookies, params }) {
     const botName = params.slug;
 
@@ -44,32 +48,41 @@ export async function load({ cookies, params }) {
 
     if (botName == BotNames.funny) {
         const tracesToRowsMap = new Map<string, number>();
-        logEntries
-            .map((x) => JSON.parse(x) as LogEntry)
-            .forEach((row, i) => {
-                const message =
-                    'text' in row ? row.text : JSON.stringify(row.errorObj);
-                const chatName = row.chatName;
-                const botName = row.botName;
-                const traceId = row.traceId.toString() ?? `TRACE:UNKNOWN:${i}`;
 
-                if (tracesToRowsMap.has(traceId)) {
-                    const rowNumber = tracesToRowsMap.get(traceId)!;
-                    groups[rowNumber].rows.push(message);
-                } else {
-                    const newArray = [message];
-                    const newGroup = {
-                        rows: newArray,
-                        traceId: traceId,
-                        botName: botName,
-                        chatName: chatName
-                    } as TraceGroup;
+        let rowAccum = '';
+        for (const row of logEntries) {
+            rowAccum += row;
 
-                    groups.push(newGroup);
+            if (!isJsonLike(rowAccum)) {
+                continue;
+            }
+            const entry = JSON.parse(rowAccum) as LogEntry;
+            rowAccum = '';
 
-                    tracesToRowsMap.set(traceId, groups.length - 1);
-                }
-            });
+            const message =
+                'text' in entry ? entry.text : JSON.stringify(entry.errorObj);
+            const chatName = entry.chatName;
+            const botName = entry.botName;
+            const traceId =
+                entry.traceId.toString() ?? `TRACE:UNKNOWN:${Math.random()}`;
+
+            if (tracesToRowsMap.has(traceId)) {
+                const rowNumber = tracesToRowsMap.get(traceId)!;
+                groups[rowNumber].rows.push(message);
+            } else {
+                const newArray = [message];
+                const newGroup = {
+                    rows: newArray,
+                    traceId: traceId,
+                    botName: botName,
+                    chatName: chatName
+                } as TraceGroup;
+
+                groups.push(newGroup);
+
+                tracesToRowsMap.set(traceId, groups.length - 1);
+            }
+        }
 
         if (actionsMetadata.size == 0) {
             await loadMetadata();
