@@ -49,7 +49,11 @@
                     : 'bg-slate-200 log-entry'}
             >
                 {#each entryGroup.rows as entry}
-                    <i>{getBotAndChatPrefixes(entryGroup)}</i> | {entry}<br />
+                    {#if currentBot.name == BotNames.minecraft}
+                        {entry}
+                    {:else}
+                        <i>{getBotAndChatPrefixes(entryGroup)}</i> | {entry}
+                    {/if}<br />
                 {/each}
             </div>
         {/each}

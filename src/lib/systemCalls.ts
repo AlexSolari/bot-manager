@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
 
-export async function getLogs(botName: string) {
+export async function getLogs(botName: string, count: number = 100) {
     return import.meta.env.MODE == 'development'
         ? (
               await execAsync(
@@ -12,8 +12,11 @@ export async function getLogs(botName: string) {
                   { shell: 'powershell.exe' }
               )
           ).stdout
-        : (await execAsync(`sudo journalctl -u ` + botName + `.service -n 100`))
-              .stdout;
+        : (
+              await execAsync(
+                  `sudo journalctl -u ` + botName + `.service -n ` + count
+              )
+          ).stdout;
 }
 export async function getStorageFiles() {
     return (
